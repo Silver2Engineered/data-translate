@@ -1,14 +1,9 @@
 #!/usr/bin/env python
-"""
-Instructions to run:
-    - [OPTIONAL] make and use a python venv with `python -m venv [venv name]` and `. [venv name]/bin/activate/`
-    - `pip install flask`
-    - `python app.py`
+""" API for the Data Translate platform
 """
 
 from flask import Flask, request
 import pandas as pd
-from covid_analysis import daily_statistics
 
 from utils import read_csv_file
 from covid_analysis import daily_statistics
