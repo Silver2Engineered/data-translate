@@ -12,7 +12,16 @@ function App() {
         <p>
           Upload a csv to get started!
         </p>
-        <input type="file" accept=".csv" />
+        <form action="/submit_file.php">
+          <input type="file" accept=".csv"/><br/>
+          <label for="pvalue" class="dataType"><pre>P Value: </pre></label>
+          <input type="number" id="pvalue" name="pvalue"/>
+          <label for="mean" class="dataType"><pre>Mean: </pre></label>
+          <input type="number" id="mean" name="mean"/>
+          <label for="standard_deviation" class="dataType"><pre>    Standard Deviation: </pre></label>
+          <input type="number" id="standardDeviation" name="standardDeviation"/><br/>
+          <input type="submit"/>
+        </form>
       </header>
     </div>
   );
