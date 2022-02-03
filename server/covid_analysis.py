@@ -30,8 +30,8 @@ def daily_statistics(
     mean_diff = df[column].mean()
     max_diff = int(df[column].max())
 
-    sentence = 'In {0}, the average number of daily {1} from {2} to {3} was {4}, with a maximum of {5} {6}.'.format(
-        group_title, column_title.lower(), start_date, end_date, round(mean_diff, 2), max_diff, column_title.lower()
+    sentence = 'In {0}, the average number of daily {1} from {2} to {3} was {4}, with a maximum of {5} {1} in a single day.'.format(
+        group_title, column_title.lower(), start_date, end_date, round(mean_diff, 2), max_diff
     )
 
     return sentence
