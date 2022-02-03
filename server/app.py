@@ -2,13 +2,16 @@
 """ API for the Data Translate platform
 """
 
+from operator import truediv
 from flask import Flask, request
+from flask_cors import CORS
 import pandas as pd
 
-from utils import read_csv_file
+from utils import read_csv_file, package_error, package_response
 from covid_analysis import daily_statistics
 
 app = Flask(__name__)
+CORS(app)
 
 state_names = {
     'AK': 'Alaska',
@@ -80,15 +83,23 @@ def analyze():
 
     state = request.args.get('state', '')
     if not state:
-        return 'Please include a state to anlyze as a keyword argument, such as "datatranslate.com/analyze?state=IL"', 400
+        return package_error('Please include a state to anlyze as a keyword argument, such as "datatranslate.com/analyze?state=IL"'), 400
 
     if state not in df['state'].values:
-        return 'Provided data does not include information for specified state "{0}"'.format(state), 400
+        return package_error('Provided data does not include information for specified state "{0}"'.format(state)), 400
     
     df['submission_date'] = pd.to_datetime(df['submission_date'])
+    state_df = df[df['state'] == state]
+    state_name = state_names[state]
 
-    daily_sentence = daily_statistics(df[df['state'] == state], state_names[state])
-    return daily_sentence
+    daily_case_sentence = daily_statistics(state_df, state_name)
+    daily_death_sentence = daily_statistics(
+        state_df, state_name, 
+        column='new_death', column_title='New Deaths', 
+        include_state=False, include_date=False)
+
+    paragraph = daily_case_sentence + ' ' + daily_death_sentence
+    return package_response(paragraph)
 
 if __name__ == "__main__":
     app.run()
