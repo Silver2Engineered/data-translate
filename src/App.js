@@ -118,9 +118,13 @@ const App = () => {
         <p>
           Upload a csv to get started!
         </p>
-        <input type="file" accept=".csv" onChange={handleFileChange}/>
+        <input 
+          type="file" 
+          accept=".csv"
+          onChange={handleFileChange}
+        />
         
-        <label >
+        <label style={{marginTop: '1em'}}>
           Select a state to analyze
         </label>
         <select onChange={handleStateChange}>
@@ -134,8 +138,20 @@ const App = () => {
           }
         </select>
 
-        <button onClick={handleSubmit}>
-          Submit
+        <button 
+          onClick={handleSubmit}
+          style={{
+            margin: '2em',
+            border: '2px solid white',
+            borderRadius: '15px',
+            color: "white",
+            padding: ".5em 2em",
+            fontWeight: 'bold',
+            fontSize: 'large',
+          }}
+          className='btn-submit'
+        >
+          Analyze
         </button>
 
         <p style={{ padding: '0 2em' }}>

@@ -21,3 +21,15 @@
 .App-link {
   color: #61dafb;
 }
+
+
+.btn-submit {
+  background: none;
+  background-color: 'rgba(255, 255, 255, 0)';
+  transition: all ease-in-out .3s;
+}
+
+.btn-submit:hover {
+  background-color: rgba(255, 255, 255, .2);
+  cursor: pointer;
+}
