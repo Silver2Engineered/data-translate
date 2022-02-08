@@ -4,6 +4,7 @@
 Functions:
     
     daily_statistics(pandas.DataFrame, str, str, str) -> str
+    recent_statistics(pandas.DataFrame, str, str, str) -> str
 
 Misc Variables:
 
