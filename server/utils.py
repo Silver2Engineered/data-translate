@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-"""Utilities for the Data Translate API
+"""Utilities for the Data Decipher API
 
 Functions:
 
     read_csv_file(flask.Request, str) -> pandas.DataFrame
+    package_error(str) -> object
+    package_response(str) -> object
 
 Misc Variables:
 

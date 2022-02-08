@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-""" API for the Data Translate platform
+""" API for the Data Decipher platform
 """
 
-from operator import truediv
 from flask import Flask, request
 from flask_cors import CORS
 import pandas as pd
@@ -95,7 +94,7 @@ def analyze():
     daily_case_sentence = daily_statistics(state_df, state_name)
     daily_death_sentence = daily_statistics(
         state_df, state_name, 
-        column='new_death', column_title='New Deaths', 
+        column='new_death', column_title='Deaths', 
         include_state=False, include_date=False)
 
     paragraph = daily_case_sentence + ' ' + daily_death_sentence
