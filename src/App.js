@@ -2,67 +2,10 @@ import logo from './logo.png';
 import './App.css';
 import { useState } from 'react';
 
-const API_URL = 'http://localhost:5000'
+import InputGroup from './components/InputGroup';
+import { stateNames } from './utils/states';
 
-const state_names = {
-  'AK': 'Alaska',
-  'AL': 'Alabama',
-  'AR': 'Arkansas',
-  'AS': 'American Samoa',
-  'AZ': 'Arizona',
-  'CA': 'California',
-  'CO': 'Colorado',
-  'CT': 'Connecticut',
-  'DC': 'District of Columbia',
-  'DE': 'Delaware',
-  'FL': 'Florida',
-  'GA': 'Georgia',
-  'GU': 'Guam',
-  'HI': 'Hawaii',
-  'IA': 'Iowa',
-  'ID': 'Idaho',
-  'IL': 'Illinois',
-  'IN': 'Indiana',
-  'KS': 'Kansas',
-  'KY': 'Kentucky',
-  'LA': 'Louisiana',
-  'MA': 'Massachusetts',
-  'MD': 'Maryland',
-  'ME': 'Maine',
-  'MI': 'Michigan',
-  'MN': 'Minnesota',
-  'MO': 'Missouri',
-  'MP': 'Northern Mariana Islands',
-  'MS': 'Mississippi',
-  'MT': 'Montana',
-  'NA': 'National',
-  'NC': 'North Carolina',
-  'ND': 'North Dakota',
-  'NE': 'Nebraska',
-  'NH': 'New Hampshire',
-  'NJ': 'New Jersey',
-  'NM': 'New Mexico',
-  'NV': 'Nevada',
-  'NY': 'New York',
-  'OH': 'Ohio',
-  'OK': 'Oklahoma',
-  'OR': 'Oregon',
-  'PA': 'Pennsylvania',
-  'PR': 'Puerto Rico',
-  'RI': 'Rhode Island',
-  'SC': 'South Carolina',
-  'SD': 'South Dakota',
-  'TN': 'Tennessee',
-  'TX': 'Texas',
-  'UT': 'Utah',
-  'VA': 'Virginia',
-  'VI': 'Virgin Islands',
-  'VT': 'Vermont',
-  'WA': 'Washington',
-  'WI': 'Wisconsin',
-  'WV': 'West Virginia',
-  'WY': 'Wyoming'
-}
+const API_URL = 'http://localhost:5000';
 
 const App = () => {
   const [state, setState] = useState('');
@@ -110,54 +53,98 @@ const App = () => {
       });
   }
 
+  console.log(file);
+
   return (
-    <div className="App">
+    <div 
+      style={{ 
+        minHeight: '100vh',
+        textAlign: 'center', 
+        color: 'white',
+        backgroundColor: '#282c34',
+      }}
+    >
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-
-        <p>
-          Upload a csv to get started!
-        </p>
-        <input 
-          type="file" 
-          accept=".csv"
-          onChange={handleFileChange}
+        <img 
+          src={logo}
+          alt="logo"
+          style={{ height: '40vmin', pointerEvents: 'none' }}
         />
-        
-        <label style={{marginTop: '1em'}}>
-          Select a state to analyze
-        </label>
-        <select onChange={handleStateChange}>
-          <option disabled selected value />
-          {
-            Object.entries(state_names).map((tuple) => (
-              <option value={tuple[0]}>
-                { tuple[1] }
-              </option>
-            ))
-          }
-        </select>
+      </header>
 
-        <button 
-          onClick={handleSubmit}
-          style={{
-            margin: '2em',
-            border: '2px solid white',
-            borderRadius: '15px',
-            color: "white",
-            padding: ".5em 2em",
-            fontWeight: 'bold',
-            fontSize: 'large',
-          }}
-          className='btn-submit'
+      <div 
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
+
+        <InputGroup
+          label={'Upload a csv to get started'}
+          style={{ margin: '1em' }}
         >
-          Analyze
-        </button>
+          <input 
+            type="file" 
+            accept=".csv"
+            onChange={handleFileChange}
+            style={{ width: 'fit-content' }}
+          />
+        </InputGroup>
+
+        {
+          file && (
+            <InputGroup
+              label={'Select a state to analyze'}
+              style={{margin: '1em'}}
+            >
+              <select 
+                onChange={handleStateChange} 
+                defaultValue={0}
+                style={{ padding: '.2em 1em' }}
+              >
+                <option disabled value={0} />
+                {
+                  Object.entries(stateNames).map((tuple) => (
+                    <option value={tuple[0]} key={tuple[0]}>
+                      { tuple[1] }
+                    </option>
+                  ))
+                }
+              </select>
+            </InputGroup>
+          )
+        }
+        
+
+        {
+          file && state && (
+            <div>
+              <button 
+                onClick={handleSubmit}
+                style={{
+                  margin: '2em',
+                  border: '2px solid white',
+                  borderRadius: '15px',
+                  color: "white",
+                  padding: ".5em 2em",
+                  fontWeight: 'bold',
+                  fontSize: 'large',
+                }}
+                className='btn-submit'
+              >
+                Analyze
+              </button>
+            </div>
+          )
+        }
+        
 
         <p style={{ padding: '0 2em' }}>
           { analysis }
         </p>
-      </header>
+      </div>
+
     </div>
   );
 }
