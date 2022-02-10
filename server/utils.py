@@ -13,6 +13,8 @@ Misc Variables:
 
 """
 
+from tokenize import Number
+from unicodedata import numeric
 from flask import Request
 import pandas as pd
 
@@ -30,3 +32,7 @@ def package_error(error: str) -> object:
 def package_response(response: str) -> object:
     """Package API response into JSON"""
     return { 'analysis': response }
+
+def format_number(number: float) -> str:
+    """Pretty print number with commas"""
+    return '{:,}'.format(number)

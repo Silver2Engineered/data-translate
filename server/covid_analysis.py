@@ -14,6 +14,8 @@ Misc Variables:
 
 import pandas as pd
 
+from utils import format_number
+
 __name__ = 'covid_analysis'
 
 
@@ -37,7 +39,7 @@ def daily_statistics(
     date = 'from {0} to {1}'.format(start_date, end_date) if include_date else ''
 
     sentence = '{0}he average number of daily {1} {2} was {3}, with a maximum of {4} {1} in a single day.'.format(
-        start, column_title.lower(), date, round(mean_diff, 2), max_diff
+        start, column_title.lower(), date, format_number(round(mean_diff, 2)), format_number(max_diff)
     )
 
     return sentence
@@ -46,15 +48,27 @@ def daily_statistics(
 def recent_statistics(
         df: pd.DataFrame,
         group_title: str,
-        colum: str = 'new_case',
+        column: str = 'new_case',
         column_title: str = 'New Cases') -> str:
+    """Generate natural language analysis of most recent week stats"""
 
     df = df.sort_values('submission_date')
 
-    week_stats = df.iloc[-1:-7]
+    week_stats = df.iloc[-7:-1]
+    week_mean = week_stats[column].mean()
+    tot_mean = df[column].mean()
 
-    print(week_stats)
+    relation = ''
+    if week_mean > tot_mean:
+        relation = 'higher'
+    elif week_mean < tot_mean:
+        relation = 'lower'
+    else:
+        relation = 'the same as'
 
-    sentence = 'For the most recent week in the data the average number of daily new cases was x. This is higher/lower than the total average over the pandemic'
+    sentence = 'For the most recent week in the data for {0} the average number of daily {1} was {2}. This is {3} than the total average over the pandemic.'.format(
+        group_title, column_title.lower(), format_number(round(week_mean, 2)), relation
+    )
+    return sentence
 
 

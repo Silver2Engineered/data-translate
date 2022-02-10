@@ -62,6 +62,7 @@ const App = () => {
         textAlign: 'center', 
         color: 'white',
         backgroundColor: '#282c34',
+        padding: '0 0 2em 0',
       }}
     >
       <header className="App-header">
@@ -140,9 +141,15 @@ const App = () => {
         }
         
 
-        <p style={{ padding: '0 2em' }}>
-          { analysis }
-        </p>
+        <div>
+          { 
+            analysis.split('\n').map(paragraph => (
+              <p style={{ padding: '0 2em' }}>
+                { paragraph }
+              </p>
+            ))
+          }
+        </div>
       </div>
 
     </div>
