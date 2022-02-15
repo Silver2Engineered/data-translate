@@ -6,71 +6,11 @@ from flask import Flask, request
 from flask_cors import CORS
 import pandas as pd
 
-from utils import read_csv_file, package_error, package_response
-from covid_analysis import daily_statistics, recent_statistics
+from utils import read_csv_file, package_error, package_response, state_names
+from covid_analysis import daily_statistics, recent_statistics, similarity_statistics
 
 app = Flask(__name__)
 CORS(app)
-
-state_names = {
-    'AK': 'Alaska',
-    'AL': 'Alabama',
-    'AR': 'Arkansas',
-    'AS': 'American Samoa',
-    'AZ': 'Arizona',
-    'CA': 'California',
-    'CO': 'Colorado',
-    'CT': 'Connecticut',
-    'DC': 'District of Columbia',
-    'DE': 'Delaware',
-    'FL': 'Florida',
-    'GA': 'Georgia',
-    'GU': 'Guam',
-    'HI': 'Hawaii',
-    'IA': 'Iowa',
-    'ID': 'Idaho',
-    'IL': 'Illinois',
-    'IN': 'Indiana',
-    'KS': 'Kansas',
-    'KY': 'Kentucky',
-    'LA': 'Louisiana',
-    'MA': 'Massachusetts',
-    'MD': 'Maryland',
-    'ME': 'Maine',
-    'MI': 'Michigan',
-    'MN': 'Minnesota',
-    'MO': 'Missouri',
-    'MP': 'Northern Mariana Islands',
-    'MS': 'Mississippi',
-    'MT': 'Montana',
-    'NA': 'National',
-    'NC': 'North Carolina',
-    'ND': 'North Dakota',
-    'NE': 'Nebraska',
-    'NH': 'New Hampshire',
-    'NJ': 'New Jersey',
-    'NM': 'New Mexico',
-    'NV': 'Nevada',
-    'NY': 'New York',
-    'OH': 'Ohio',
-    'OK': 'Oklahoma',
-    'OR': 'Oregon',
-    'PA': 'Pennsylvania',
-    'PR': 'Puerto Rico',
-    'RI': 'Rhode Island',
-    'SC': 'South Carolina',
-    'SD': 'South Dakota',
-    'TN': 'Tennessee',
-    'TX': 'Texas',
-    'UT': 'Utah',
-    'VA': 'Virginia',
-    'VI': 'Virgin Islands',
-    'VT': 'Vermont',
-    'WA': 'Washington',
-    'WI': 'Wisconsin',
-    'WV': 'West Virginia',
-    'WY': 'Wyoming'
-}
 
 @app.route('/')
 def index():
@@ -80,13 +20,17 @@ def index():
 def analyze():
     df = read_csv_file(request)
 
+     # Filter out state names we don't know (temporary fix)
+     # Reasoning: some of the entries in dataset are cities like NYC
+    df = df[df['state'].isin(state_names.keys())]
+
     state = request.args.get('state', '')
     if not state:
         return package_error('Please include a state to analyze as a keyword argument, such as "datatranslate.com/analyze?state=IL"'), 400
 
     if state not in df['state'].values:
         return package_error('Provided data does not include information for specified state "{0}"'.format(state)), 400
-    
+
     df['submission_date'] = pd.to_datetime(df['submission_date'])
     state_df = df[df['state'] == state]
     state_name = state_names[state]
@@ -99,7 +43,9 @@ def analyze():
 
     recent_sentence = recent_statistics(state_df, state_name)
 
-    paragraph = daily_case_sentence + ' ' + daily_death_sentence + '\n' + recent_sentence
+    similarity_sentence = similarity_statistics(df, state)
+
+    paragraph = daily_case_sentence + ' ' + daily_death_sentence + '\n' + recent_sentence + '\n' + similarity_sentence
     return package_response(paragraph)
 
 if __name__ == "__main__":
