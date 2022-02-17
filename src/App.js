@@ -53,8 +53,6 @@ const App = () => {
       });
   }
 
-  console.log(file);
-
   return (
     <div 
       style={{ 
@@ -94,7 +92,7 @@ const App = () => {
         </InputGroup>
 
         {
-          file && (
+          !!file && (
             <InputGroup
               label={'Select a state to analyze'}
               style={{margin: '1em'}}
@@ -119,7 +117,7 @@ const App = () => {
         
 
         {
-          file && state && (
+          !!file && !!state && (
             <div>
               <button 
                 onClick={handleSubmit}
@@ -141,15 +139,21 @@ const App = () => {
         }
         
 
-        <div>
-          { 
-            analysis.split('\n').map(paragraph => (
-              <p style={{ padding: '0 2em' }}>
-                { paragraph }
-              </p>
-            ))
-          }
-        </div>
+        {
+          !!analysis && (
+            <div className="card" style={{ maxWidth: '60em', margin: '0 auto', }}>
+              <h2>{ `${stateNames[state]} Analysis` }</h2>
+              { 
+                analysis.split('\n').map(paragraph => (
+                  <p style={{ padding: '0 2em' }}>
+                    { paragraph }
+                  </p>
+                ))
+              }
+            </div>
+          )
+        }
+        
       </div>
 
     </div>
