@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" Module with tools to analyze covid specific datasets
+""" Module with tools to analyze county birth anaysis datasets
 
 Functions:
     
@@ -15,20 +15,22 @@ Misc Variables:
 import pandas as pd
 from typing import Callable
 
-from utils import format_number, format_percent, state_names
+from utils import format_number, format_percent
 
-__name__ = 'covid_analysis'
+__name__ = 'birth_analysis'
 
 
 def daily_statistics(
         df: pd.DataFrame,
         group_title: str,
-        column: str = 'new_case',
-        column_title: str = 'New Cases',
+        column: str = 'Count',
+        column_title: str = 'Total Births',
         include_state: bool = True,
         include_date: bool = True
     ) -> str:
     """Create natural language analysis of daily stats"""
+
+    # Add up births for all age groups and geography types
 
     df = df.sort_values('submission_date')
     start_date = df['submission_date'].iloc[0].date().strftime('%B %d, %Y')

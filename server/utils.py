@@ -13,6 +13,7 @@ Misc Variables:
 
 """
 
+from xmlrpc.client import boolean
 from flask import Request
 import pandas as pd
 
@@ -38,6 +39,11 @@ def format_number(number: float) -> str:
 def format_percent(percent: float) -> str:
     """Generate pretty-printable percent from decimal"""
     return '{0}%'.format(format_number(round(percent * 100, 2)))
+
+def is_covid_data(request: Request, file_key: str = 'data', covid_file_name: str = 'covid-data.csv') -> bool:
+    """Determine if request data is covid dataset"""
+    return request.files[file_key].filename == covid_file_name
+
 
 state_names = {
     'AK': 'Alaska',

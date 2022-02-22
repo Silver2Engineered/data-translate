@@ -1,4 +1,5 @@
-export const stateNames = {
+
+const stateNames = {
   'AK': 'Alaska',
   'AL': 'Alabama',
   'AR': 'Arkansas',
@@ -57,3 +58,5 @@ export const stateNames = {
   'WV': 'West Virginia',
   'WY': 'Wyoming'
 };
+
+export default stateNames;

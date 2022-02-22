@@ -3,22 +3,36 @@ import './App.css';
 import { useState } from 'react';
 
 import InputGroup from './components/InputGroup';
-import { stateNames } from './utils/states';
+import { stateNames, countyNames } from './utils';
 
 const API_URL = 'http://localhost:5000';
 
 const App = () => {
-  const [state, setState] = useState('');
+  const [group, setGroup] = useState('');
   const [file, setFile] = useState();
+  const [groups, setGroups] = useState([]);
   const [analysis, setAnalysis] = useState('');
 
-  const handleFileChange = (ev) => (
-    setFile(ev.target.files[0])
-  );
+  const handleFileChange = (ev) => {
+    const file = ev.target.files[0];
+    setFile(file);
 
-  const handleStateChange = (ev) => (
-    setState(ev.target.value)
-  );
+    switch (file.name) {
+      case 'covid-data.csv':
+        setGroups(stateNames);
+        break;
+      case 'ca_birth_data.csv':
+        setGroups(countyNames)
+        break;
+      default:
+        setGroups([]);
+    }
+  };
+
+  const handleStateChange = (ev) => {
+    setGroup(ev.target.value)
+    setAnalysis('');
+  }
 
   const handleSubmit = () => {
     if (!file) {
@@ -26,8 +40,8 @@ const App = () => {
       return;
     }
 
-    if (!state) {
-      alert('Please select a state to analyze.');
+    if (!group) {
+      alert('Please select a group to analyze.');
       return;
     }
 
@@ -36,7 +50,7 @@ const App = () => {
     formData.append("data", file);
 
     fetch(
-      `${API_URL}/analyze?state=${state}`,
+      `${API_URL}/analyze?group=${group}`,
       {
         method: 'POST',
         body: formData
@@ -94,7 +108,7 @@ const App = () => {
         {
           !!file && (
             <InputGroup
-              label={'Select a state to analyze'}
+              label={'Select a group to analyze'}
               style={{margin: '1em'}}
             >
               <select 
@@ -104,7 +118,7 @@ const App = () => {
               >
                 <option disabled value={0} />
                 {
-                  Object.entries(stateNames).map((tuple) => (
+                  Object.entries(groups).map((tuple) => (
                     <option value={tuple[0]} key={tuple[0]}>
                       { tuple[1] }
                     </option>
@@ -117,7 +131,7 @@ const App = () => {
         
 
         {
-          !!file && !!state && (
+          !!file && !!group && (
             <div>
               <button 
                 onClick={handleSubmit}
@@ -142,7 +156,7 @@ const App = () => {
         {
           !!analysis && (
             <div className="card" style={{ maxWidth: '60em', margin: '0 auto', }}>
-              <h2>{ `${stateNames[state]} Analysis` }</h2>
+              <h2>{ `${groups[group]} Analysis` }</h2>
               { 
                 analysis.split('\n').map(paragraph => (
                   <p style={{ padding: '0 2em' }}>
