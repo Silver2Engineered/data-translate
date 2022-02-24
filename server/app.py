@@ -6,8 +6,10 @@ from flask import Flask, request
 from flask_cors import CORS
 import pandas as pd
 
-from utils import read_csv_file, package_error, package_response, state_names, is_covid_data
-from covid_analysis import daily_statistics, recent_statistics, similarity_statistics
+import utils
+import covid_analysis as covid
+import birth_analysis as birth
+import analysis
 
 app = Flask(__name__)
 CORS(app)
@@ -18,19 +20,17 @@ def index():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    df = read_csv_file(request)
-    is_covid = is_covid_data(request)
+    df = utils.read_csv_file(request)
+    is_covid = utils.is_covid_data(request)
 
     sort_col = df.columns[0]
     group_col = df.columns[1]
 
      # Filter out state names we don't know (temporary fix)
      # Reasoning: some of the entries in dataset are cities like NYC
-    df = df[df[group_col].isin(state_names.keys())]
-
     group = request.args.get('group', '')
     if not group:
-        return package_error('Please include a ' + group_col + ' to analyze as a keyword argument, such as "datadecipher.com/analyze?' + group_col + '=IL"'), 400
+        return utils.package_error('Please include a ' + group_col + ' to analyze as a keyword argument, such as "datadecipher.com/analyze?' + group_col + '=IL"'), 400
 
     '''
     if group not in df[group_col].values:
@@ -43,23 +43,35 @@ def analyze():
     paragraph = ''
 
     if (is_covid):
-        state_name = state_names[group]
-        daily_case_sentence = daily_statistics(filtered_df, state_name)
-        daily_death_sentence = daily_statistics(
+        state_name = utils.state_names[group]
+        daily_case_sentence = covid.daily_statistics(filtered_df, state_name)
+        daily_death_sentence = covid.daily_statistics(
             filtered_df, state_name, 
             column='new_death', column_title='Deaths', 
             include_state=False, include_date=False)
-        recent_sentence = recent_statistics(filtered_df, state_name)
+        recent_sentence = analysis.recent_statistics(filtered_df, state_name)
 
-        similarity_sentence = similarity_statistics(df, group)
+        similarity_sentence = covid.similarity_statistics(df, group)
 
         paragraph = daily_case_sentence + ' ' + daily_death_sentence + '\n' + recent_sentence + '\n' + similarity_sentence
 
     else:
         # group = county name for ca_birth_data.csv
-        paragraph = 'not covid'
 
-    return package_response(paragraph)
+        merged_df = utils.transform_birth_data(filtered_df, ['Year', 'County'])
+        county_name = group
+
+        recent_sentence = analysis.recent_statistics(
+            merged_df, county_name+' county',
+            column='Total', column_title='number of births',
+            interval=[-5, -1], interval_title='five years',
+            timeframe_step_title='annual',
+            timeframe_title='across all counties',
+            show_total_average=True)
+
+        paragraph = recent_sentence
+
+    return utils.package_response(paragraph)
 
 if __name__ == "__main__":
     app.run()

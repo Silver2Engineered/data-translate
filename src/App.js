@@ -158,8 +158,8 @@ const App = () => {
             <div className="card" style={{ maxWidth: '60em', margin: '0 auto', }}>
               <h2>{ `${groups[group]} Analysis` }</h2>
               { 
-                analysis.split('\n').map(paragraph => (
-                  <p style={{ padding: '0 2em' }}>
+                analysis.split('\n').map((paragraph, idx) => (
+                  <p key={idx} style={{ padding: '0 2em', textAlign: 'left' }}>
                     { paragraph }
                   </p>
                 ))

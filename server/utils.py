@@ -44,6 +44,14 @@ def is_covid_data(request: Request, file_key: str = 'data', covid_file_name: str
     """Determine if request data is covid dataset"""
     return request.files[file_key].filename == covid_file_name
 
+def transform_birth_data(
+        df: pd.DataFrame,
+        groupby_cols: list = ['Year', 'County'],
+    ) -> pd.DataFrame:
+    """Aggregate total count of births per year per county from birth dataframe"""
+    df_total = df[df['Strata'] == 'Total Population'].groupby(groupby_cols, as_index = False)['Count'].sum()
+    df_total.columns = ['Year', 'County', 'Total']  
+    return df_total
 
 state_names = {
     'AK': 'Alaska',

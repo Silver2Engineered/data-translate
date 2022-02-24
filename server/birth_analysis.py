@@ -15,7 +15,7 @@ Misc Variables:
 import pandas as pd
 from typing import Callable
 
-from utils import format_number, format_percent
+from utils import format_number, format_percent, state_names
 
 __name__ = 'birth_analysis'
 
@@ -53,26 +53,27 @@ def recent_statistics(
         df: pd.DataFrame,
         group_title: str,
         column: str = 'new_case',
-        column_title: str = 'New Cases'
+        column_title: str = 'New Cases',
+        interval: list = [-7, -1],
+        interval_title: str = 'week',
+        timeframe_title: str = 'over the pandemic'
     ) -> str:
     """Generate natural language analysis of most recent week stats"""
 
-    df = df.sort_values('submission_date')
-
-    week_stats = df.iloc[-7:-1]
-    week_mean = week_stats[column].mean()
+    interval_stats = df.iloc[interval[0]:interval[1]]
+    interval_mean = interval_stats[column].mean()
     tot_mean = df[column].mean()
 
     relation = ''
-    if week_mean > tot_mean:
+    if interval_mean > tot_mean:
         relation = 'higher'
-    elif week_mean < tot_mean:
+    elif interval_mean < tot_mean:
         relation = 'lower'
     else:
         relation = 'the same as'
 
-    sentence = 'For the most recent week in {0}, the average number of daily {1} was {2}. This is {3} than the total average over the pandemic.'.format(
-        group_title, column_title.lower(), format_number(round(week_mean, 2)), relation
+    sentence = 'For the most recent {0} in {1}, the average number of daily {2} was {3}. This is {4} than the total average {5}.'.format(
+        interval_title, group_title, column_title.lower(), format_number(round(interval_mean, 2)), relation, timeframe_title
     )
     return sentence
 
