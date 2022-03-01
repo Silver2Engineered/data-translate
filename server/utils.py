@@ -53,6 +53,12 @@ def transform_birth_data(
     df_total.columns = ['Year', 'County', 'Total']  
     return df_total
 
+def percent_change(cur: float, prev: float) -> float:
+    """Calculate percent change with checks for zero valued denominators"""
+    if cur != 0 and prev == 0: return float('inf')
+    if cur == 0 and prev == 0: return 0
+    return (cur - prev) / prev
+
 state_names = {
     'AK': 'Alaska',
     'AL': 'Alabama',

@@ -26,13 +26,13 @@ def analyze():
     sort_col = df.columns[0]
     group_col = df.columns[1]
 
-     # Filter out state names we don't know (temporary fix)
-     # Reasoning: some of the entries in dataset are cities like NYC
     group = request.args.get('group', '')
     if not group:
         return utils.package_error('Please include a ' + group_col + ' to analyze as a keyword argument, such as "datadecipher.com/analyze?' + group_col + '=IL"'), 400
 
     '''
+    # Filter out state names we don't know (temporary fix)
+    # Reasoning: some of the entries in dataset are cities like NYC
     if group not in df[group_col].values:
         return package_error('Provided data does not include information for specified state "{0}"'.format(group)), 400
     '''
@@ -51,25 +51,39 @@ def analyze():
             include_state=False, include_date=False)
         recent_sentence = analysis.recent_statistics(filtered_df, state_name)
 
-        similarity_sentence = covid.similarity_statistics(df, group)
+        similarity_sentence = analysis.similarity_statistics(df, group)
 
         paragraph = daily_case_sentence + ' ' + daily_death_sentence + '\n' + recent_sentence + '\n' + similarity_sentence
 
     else:
-        # group = county name for ca_birth_data.csv
-
-        merged_df = utils.transform_birth_data(filtered_df, ['Year', 'County'])
+        merged_df = utils.transform_birth_data(df, ['Year', 'County'])
         county_name = group
 
+        filtered_df = merged_df[merged_df[group_col] == county_name]
+
         recent_sentence = analysis.recent_statistics(
-            merged_df, county_name+' county',
-            column='Total', column_title='number of births',
-            interval=[-5, -1], interval_title='five years',
+            merged_df, 
+            county_name+' county',
+            column='Total',
+            column_title='number of births',
+            interval=[-5, -1],
+            interval_title='five years',
             timeframe_step_title='annual',
             timeframe_title='across all counties',
             show_total_average=True)
+        
+        similarity_sentence = analysis.similarity_statistics(
+            merged_df,
+            target_group=county_name,
+            feature_col='Total',
+            feature_title='number of births',
+            group_col='County',
+            group_title_map=lambda x: x+' county',
+            interval_size=2,
+            interval_title='two years',
+            interval_increment_title='year')
 
-        paragraph = recent_sentence
+        paragraph = recent_sentence+'\n'+similarity_sentence
 
     return utils.package_response(paragraph)
 

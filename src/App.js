@@ -20,12 +20,18 @@ const App = () => {
     switch (file.name) {
       case 'covid-data.csv':
         setGroups(stateNames);
+        setGroup('');
+        setAnalysis('');
         break;
       case 'ca_birth_data.csv':
-        setGroups(countyNames)
+        setGroups(countyNames);
+        setGroup('');
+        setAnalysis('');
         break;
       default:
         setGroups([]);
+        setGroup('');
+        setAnalysis('');
     }
   };
 
@@ -68,15 +74,7 @@ const App = () => {
   }
 
   return (
-    <div 
-      style={{ 
-        minHeight: '100vh',
-        textAlign: 'center', 
-        color: 'white',
-        backgroundColor: '#282c34',
-        padding: '0 0 2em 0',
-      }}
-    >
+    <div style={{height: '100vh', overflow: 'auto'}}>
       <header className="App-header">
         <img 
           src={logo}
@@ -154,8 +152,8 @@ const App = () => {
         
 
         {
-          !!analysis && (
-            <div className="card" style={{ maxWidth: '60em', margin: '0 auto', }}>
+          !!file && !!group && !!analysis && (
+            <div className="card" style={{ maxWidth: '60em', margin: '0 auto 1em auto', }}>
               <h2>{ `${groups[group]} Analysis` }</h2>
               { 
                 analysis.split('\n').map((paragraph, idx) => (
