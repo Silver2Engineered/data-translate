@@ -7,8 +7,6 @@ from flask_cors import CORS
 import pandas as pd
 
 import utils
-import covid_analysis as covid
-import birth_analysis as birth
 import analysis
 
 app = Flask(__name__)
@@ -36,20 +34,32 @@ def analyze():
     if group not in df[group_col].values:
         return package_error('Provided data does not include information for specified state "{0}"'.format(group)), 400
     '''
-    df[sort_col] = pd.to_datetime(df[sort_col])
+    if (is_covid): 
+        df[sort_col] = pd.to_datetime(df[sort_col])
+    
     df.sort_values(sort_col, inplace=True)
-    filtered_df = df[df[group_col] == group]
         
     paragraph = ''
 
     if (is_covid):
+        filtered_df = df[df[group_col] == group]
         state_name = utils.state_names[group]
-        daily_case_sentence = covid.daily_statistics(filtered_df, state_name)
-        daily_death_sentence = covid.daily_statistics(
-            filtered_df, state_name, 
-            column='new_death', column_title='Deaths', 
-            include_state=False, include_date=False)
-        recent_sentence = analysis.recent_statistics(filtered_df, state_name)
+
+        daily_case_sentence = analysis.timeframe_statistics(
+            filtered_df,
+            group_title=state_name)
+
+        daily_death_sentence = analysis.timeframe_statistics(
+            filtered_df,
+            group_title=state_name, 
+            target_column='new_death',
+            target_column_title='deaths', 
+            include_group_title=False,
+            include_timeframe=False)
+
+        recent_sentence = analysis.recent_statistics(
+            filtered_df, 
+            group_title=state_name)
 
         similarity_sentence = analysis.similarity_statistics(df, group)
 
@@ -83,7 +93,18 @@ def analyze():
             interval_title='two years',
             interval_increment_title='year')
 
-        paragraph = recent_sentence+'\n'+similarity_sentence
+        timeframe_sentence = analysis.timeframe_statistics(
+            filtered_df,
+            group_title=county_name+' county',
+            timeframe_column='Year',
+            target_column='Total',
+            target_column_title='births',
+            target_column_metric_title='number of annual',
+            timeframe_step_title='year',
+            timeframe_format=lambda s: s
+        )
+
+        paragraph = recent_sentence+'\n'+similarity_sentence+'\n'+timeframe_sentence
 
     return utils.package_response(paragraph)
 

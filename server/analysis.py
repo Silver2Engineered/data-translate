@@ -5,6 +5,7 @@ Functions:
 
     recent_statistics(pandas.DataFrame, str, str, str, list, str, str, str, bool) -> str
     similarity_statistics(pandas.DataFrame, str, str, str, str, Callable, int, str, str) -> str
+    timeframe_statistics(pandas.DataFrame, str, str, str, str, str, Callable, bool, bool) -> str
 
 Misc Variables:
 
@@ -141,3 +142,38 @@ def similarity_statistics(
     
     return '{0} {1}'.format(target_sentence, similar_sentence)
 
+
+def timeframe_statistics(
+        df: pd.DataFrame,
+        group_title: str,
+        timeframe_column: str = 'submission_date',
+        target_column: str = 'new_case',
+        target_column_title: str = 'new cases',
+        target_column_metric_title: str = 'number of daily',
+        timeframe_step_title: str = 'day',
+        timeframe_format: Callable = lambda s: s.date().strftime('%B %d, %Y'),
+        include_group_title: bool = True,
+        include_timeframe: bool = True,
+    ) -> str:
+    """Create natural language analysis of daily stats"""
+
+    mean_diff = df[target_column].mean()
+    max_diff = int(df[target_column].max())
+
+    start_date = timeframe_format(df[timeframe_column].iloc[0])
+    end_date = timeframe_format(df[timeframe_column].iloc[-1])
+
+    start = 'In {0}, t'.format(group_title) if include_group_title else 'T'
+    date = 'from {0} to {1} '.format(start_date, end_date) if include_timeframe else ''
+
+    sentence = '{0}he average {1} {2} {3}was {4}, with a maximum of {5} {2} in a single {6}.'.format(
+        start,
+        target_column_metric_title,
+        target_column_title,
+        date,
+        format_number(round(mean_diff, 2)),
+        format_number(max_diff),
+        timeframe_step_title,
+    )
+
+    return sentence
