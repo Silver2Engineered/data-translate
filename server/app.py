@@ -104,7 +104,7 @@ def analyze():
             timeframe_format=lambda s: s
         )
 
-        paragraph = recent_sentence+'\n'+similarity_sentence+'\n'+timeframe_sentence
+        paragraph = timeframe_sentence +'\n'+ recent_sentence +'\n'+ similarity_sentence
 
     return utils.package_response(paragraph)
 

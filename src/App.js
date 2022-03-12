@@ -1,6 +1,6 @@
 import logo from './logo.png';
 import './App.css';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 
 import InputGroup from './components/InputGroup';
 import { stateNames, countyNames } from './utils';
@@ -8,10 +8,17 @@ import { stateNames, countyNames } from './utils';
 const API_URL = 'http://localhost:5000';
 
 const App = () => {
-  const [group, setGroup] = useState('');
   const [file, setFile] = useState();
   const [groups, setGroups] = useState([]);
+  const [group, setGroup] = useState(0);
   const [analysis, setAnalysis] = useState('');
+
+  const selectRef = createRef(null);
+
+  const resetGroup = () => {
+    setGroup(0);
+    if (selectRef.current) selectRef.current.value = 0;
+  }
 
   const handleFileChange = (ev) => {
     const file = ev.target.files[0];
@@ -20,22 +27,19 @@ const App = () => {
     switch (file.name) {
       case 'covid-data.csv':
         setGroups(stateNames);
-        setGroup('');
-        setAnalysis('');
         break;
       case 'ca_birth_data.csv':
         setGroups(countyNames);
-        setGroup('');
-        setAnalysis('');
         break;
       default:
         setGroups([]);
-        setGroup('');
-        setAnalysis('');
     }
+
+    setAnalysis('');
+    resetGroup();
   };
 
-  const handleStateChange = (ev) => {
+  const handleGroupChange = (ev) => {
     setGroup(ev.target.value)
     setAnalysis('');
   }
@@ -110,7 +114,8 @@ const App = () => {
               style={{margin: '1em'}}
             >
               <select 
-                onChange={handleStateChange} 
+                ref={selectRef}
+                onChange={handleGroupChange} 
                 defaultValue={0}
                 style={{ padding: '.2em 1em' }}
               >
